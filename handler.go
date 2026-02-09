@@ -298,6 +298,11 @@ func maybeBackupMediaOnReply(
 	if exists && stored.BackedUp {
 		return
 	}
+	// По reply добираем только исчезающие медиа:
+	// если медиа уже присутствует в архиве (даже без байтов), повторный бэкап не нужен.
+	if exists && stored.MediaType != "" {
+		return
+	}
 
 	mediaType := stored.MediaType
 	mediaFileID := stored.MediaFileID
@@ -308,6 +313,9 @@ func maybeBackupMediaOnReply(
 		mediaCaption = msg.ReplyToMessage.Caption
 	}
 	if mediaFileID == "" || mediaType == "" {
+		return
+	}
+	if mediaType != "photo" && mediaType != "video" {
 		return
 	}
 
